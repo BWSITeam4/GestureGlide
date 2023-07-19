@@ -1,2 +1,2 @@
-# GestureGlide
+# HandiCopter
 Our BWSI Final Project
