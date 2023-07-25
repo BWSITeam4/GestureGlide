@@ -17,6 +17,10 @@ SoftwareSerial BT(2, 3); // RX, TX
 #define in4TWO 14
 #define enBTWO 15
 
+// !! DEFINE THERMISTOR_PIN AND PHOTORESISTOR_PIN !!
+const int THERMISTOR_PIN = A0;
+const int PHOTORESISTOR_PIN = A1;
+
 int x = 1;
 int xAxis = 140, yAxis = 140;
 int readByte;
