@@ -99,12 +99,12 @@ void loop() {
       // Move forward or backward
       if (yAxis < 140 - deadZone) {
         // Forward
-        forword();
+        forward();
         motorSpeedA = map(yAxis, 140 - deadZone, 60, 0, speedRange);
         motorSpeedB = map(yAxis, 140 - deadZone, 60, 0, speedRange);
       } else if (yAxis > 140 + deadZone) {
         // Backward
-        backword();
+        backward();
         motorSpeedA = map(yAxis, 140 + deadZone, 220, 0, speedRange);
         motorSpeedB = map(yAxis, 140 + deadZone, 220, 0, speedRange);
       }
@@ -112,25 +112,25 @@ void loop() {
       // Move diagonally
       if (xAxis < 140 - deadZone && yAxis < 140 - deadZone) {
         // Forward-left
-        forword();
+        forward();
         turnLeft();
         motorSpeedA = map(xAxis, 140 - deadZone, 60, 0, speedRange);
         motorSpeedB = 255;
       } else if (xAxis > 140 + deadZone && yAxis < 140 - deadZone) {
         // Forward-right
-        forword();
+        forward();
         turnRight();
         motorSpeedA = 255;
         motorSpeedB = map(xAxis, 140 + deadZone, 220, 0, speedRange);
       } else if (xAxis < 140 - deadZone && yAxis > 140 + deadZone) {
         // Backward-left
-        backword();
+        backward();
         turnLeft();
         motorSpeedA = map(xAxis, 140 - deadZone, 60, speedRange, 50);
         motorSpeedB = 255;
       } else if (xAxis > 140 + deadZone && yAxis > 140 + deadZone) {
         // Backward-right
-        backword();
+        backward();
         turnRight();
         motorSpeedA = 255;
         motorSpeedB = map(xAxis, 140 + deadZone, 220, speedRange, 50);
