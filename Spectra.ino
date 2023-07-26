@@ -7,24 +7,27 @@ SoftwareSerial BT(2, 3); // RX, TX
 #define in2ONE 6
 #define in3ONE 7
 #define in4ONE 8
+#define enBONE 9  // Assign a pin for motor controller 1, Motor B
 
 // Motor control pins for L298 Motor Controller 2
-#define enATWO 9
-#define in1TWO 10
-#define in2TWO 11
-#define in3TWO 12
-#define in4TWO 13
+#define enATWO 10 // Assign a pin for motor controller 2, Motor A
+#define in1TWO 11
+#define in2TWO 12
+#define in3TWO 13
+#define in4TWO 14
+#define enBTWO 15 // Assign a pin for motor controller 2, Motor B
 
 int xAxis = 140, yAxis = 140;
-int readByte;
 int motorSpeedA = 0;
 int motorSpeedB = 0;
 
-const int RELAY_PIN = A5;
+const int deadZone = 10; // Define the dead zone around the center position
 
 void setup() {
   pinMode(enAONE, OUTPUT);
+  pinMode(enBONE, OUTPUT); 
   pinMode(enATWO, OUTPUT);
+  pinMode(enBTWO, OUTPUT); 
   pinMode(in1ONE, OUTPUT);
   pinMode(in2ONE, OUTPUT);
   pinMode(in3ONE, OUTPUT);
@@ -36,8 +39,9 @@ void setup() {
 
   Serial.begin(9600);
   BT.begin(9600); // Default communication rate of the Bluetooth module
-  delay(500);
 }
+
+// ... (rest of the code remains unchanged)
 
 void loop() {
   // Read the incoming data from the Smartphone Android App
@@ -52,7 +56,6 @@ void loop() {
 
   // Motor control logic...
   int speedRange = 255; // Maximum speed range for the motors
-  int deadZone = 10; // Define the dead zone around the center position
 
   if (xAxis > 140 - deadZone && xAxis < 140 + deadZone && yAxis > 140 - deadZone && yAxis < 140 + deadZone) {
     // Joystick in the center, stop the motors
@@ -113,6 +116,10 @@ void loop() {
     }
   }
 
+  // Ensure motor speeds are within the valid range
+  motorSpeedA = constrain(motorSpeedA, 0, 255);
+  motorSpeedB = constrain(motorSpeedB, 0, 255);
+
   // Motor control functions for L298 Motor Controller 1
   setMotorSpeedL298_1(motorSpeedA, motorSpeedB);
 
@@ -120,12 +127,15 @@ void loop() {
   setMotorSpeedL298_2(motorSpeedA, motorSpeedB);
 }
 
+// ... (previous code remains the same)
+
 // Motor control functions for L298 Motor Controller 1
 void setMotorSpeedL298_1(int speedA, int speedB) {
+  analogWrite(enAONE, speedA);
+  analogWrite(enBONE, speedB);
   if (speedA > 0) {
     digitalWrite(in1ONE, HIGH);
     digitalWrite(in2ONE, LOW);
-    analogWrite(enAONE, speedA);
   } else {
     digitalWrite(in1ONE, LOW);
     digitalWrite(in2ONE, LOW);
@@ -134,7 +144,6 @@ void setMotorSpeedL298_1(int speedA, int speedB) {
   if (speedB > 0) {
     digitalWrite(in3ONE, HIGH);
     digitalWrite(in4ONE, LOW);
-    analogWrite(enATWO, speedB);
   } else {
     digitalWrite(in3ONE, LOW);
     digitalWrite(in4ONE, LOW);
@@ -143,10 +152,11 @@ void setMotorSpeedL298_1(int speedA, int speedB) {
 
 // Motor control functions for L298 Motor Controller 2
 void setMotorSpeedL298_2(int speedA, int speedB) {
+  analogWrite(enATWO, speedA);
+  analogWrite(enBTWO, speedB);
   if (speedA > 0) {
     digitalWrite(in1TWO, HIGH);
     digitalWrite(in2TWO, LOW);
-    analogWrite(enAONE, speedA);
   } else {
     digitalWrite(in1TWO, LOW);
     digitalWrite(in2TWO, LOW);
@@ -155,12 +165,13 @@ void setMotorSpeedL298_2(int speedA, int speedB) {
   if (speedB > 0) {
     digitalWrite(in3TWO, HIGH);
     digitalWrite(in4TWO, LOW);
-    analogWrite(enATWO, speedB);
   } else {
     digitalWrite(in3TWO, LOW);
     digitalWrite(in4TWO, LOW);
   }
 }
+
+// ... (rest of the code remains the same)
 
 // Your motor control functions (forward, backward, etc.) were not defined correctly
 // I'll provide the correct implementations below:
