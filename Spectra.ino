@@ -1,5 +1,8 @@
 #include <SoftwareSerial.h>
 SoftwareSerial BT(2, 3); // RX, TX
+// GPS
+#include <SoftwareSerial.h>
+SoftwareSerial(16, 17); //RX, TX
 
 // Motor control pins for L298 Motor Controller 1
 #define enAONE 4
@@ -39,6 +42,8 @@ void setup() {
 
   Serial.begin(9600);
   BT.begin(9600); // Default communication rate of the Bluetooth module
+  gpsSerial.begin(9600); // GPS module baud rate
+
 }
 
 // ... (rest of the code remains unchanged)
@@ -52,6 +57,18 @@ void loop() {
     Serial.print(xAxis);
     Serial.print(",");
     Serial.println(yAxis);
+  }
+  while (gpsSerial.available() > 0) {
+    if (gps.encode(gpsSerial.read())) {
+      // Read GPS data and format it as a string
+      String gpsData = "LT " + String(gps.location.lat(), 6) + ", LG: " + String(gps.location.lng(), 6);
+
+      // Send GPS data via Bluetooth
+      btSerial.println(gpsData);
+
+      // Output to Serial Monitor for debugging
+      Serial.println(gpsData);
+    }
   }
 
   // Motor control logic...
