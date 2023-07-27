@@ -84,7 +84,7 @@ void loop() {
 
     } else {
 
-      if (xAxis > 130 && xAxis < 150) {
+      if (xAxis > 120 && xAxis < 160) {
 
         if (yAxis < 130) {
           forward();
@@ -174,10 +174,10 @@ void loop() {
     digitalWrite(bottomRightCCW, LOW);
     digitalWrite(bottomLeftCW, LOW);
     digitalWrite(bottomLeftCCW, HIGH);
-    digitalWrite(topLeftCW, HIGH);
-    digitalWrite(topLeftCCW, LOW);
-    digitalWrite(topRightCW, LOW);
-    digitalWrite(topRightCCW, HIGH);
+    digitalWrite(topLeftCW, LOW);
+    digitalWrite(topLeftCCW, HIGH);
+    digitalWrite(topRightCW, HIGH);
+    digitalWrite(topRightCCW, LOW);
   }
 
   void turnRight() {
@@ -185,10 +185,10 @@ void loop() {
     digitalWrite(bottomRightCCW, HIGH);
     digitalWrite(bottomLeftCW, HIGH);
     digitalWrite(bottomLeftCCW, LOW);
-    digitalWrite(topLeftCW, LOW);
-    digitalWrite(topLeftCCW, HIGH);
-    digitalWrite(topRightCW, HIGH);
-    digitalWrite(topRightCCW, LOW);
+    digitalWrite(topLeftCW, HIGH);
+    digitalWrite(topLeftCCW, LOW);
+    digitalWrite(topRightCW, Low);
+    digitalWrite(topRightCCW, HIGH);
   }
 
   void Stop() {
