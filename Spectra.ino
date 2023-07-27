@@ -131,10 +131,10 @@ void setMotorSpeedL298_1(int speedA, int speedB) {
 
   // Set motor directions based on motor speeds
   digitalWrite(bottomRightCW, speedA > 0 ? HIGH : LOW);
-  digitalWrite(bottomRightCCW, LOW);
+  digitalWrite(bottomRightCCW, speedA < 0 ? HIGH : LOW);
 
   digitalWrite(bottomLeftCW, speedB > 0 ? HIGH : LOW);
-  digitalWrite(bottomLeftCCW, LOW);
+  digitalWrite(bottomLeftCCW, speedB < 0 ? HIGH : LOW);
 }
 
 // Function to set motor speeds for L298 Motor Controller 2
@@ -149,12 +149,12 @@ void setMotorSpeedL298_2(int speedA, int speedB) {
 
   // Set motor directions based on motor speeds
   digitalWrite(topLeftCW, speedA > 0 ? HIGH : LOW);
-  digitalWrite(topLeftCCW, speedA > 0 ? LOW : HIGH);
+  digitalWrite(topLeftCCW, speedA < 0 ? HIGH : LOW);
 
   digitalWrite(topRightCW, speedB > 0 ? HIGH : LOW);
-  digitalWrite(topRightCCW, speedB > 0 ? LOW : HIGH);
+  digitalWrite(topRightCCW, speedB < 0 ? HIGH : LOW);
 }
-
+  
 // Motor control functions for movement directions
 void forward() {
   digitalWrite(bottomRightCW, HIGH);
