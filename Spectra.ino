@@ -75,11 +75,15 @@ void loop() {
       forward();
       motorSpeedA = map(yAxis, 140 + deadZone, 255, 0, speedRange);
       motorSpeedB = map(yAxis, 140 + deadZone, 255, 0, speedRange);
+      motorSpeedC = map(yAxis, 140 + deadZone, 255, 0, speedRange);
+      motorSpeedD = map(yAxis, 140 + deadZone, 255, 0, speedRange);
     } else if (yAxis < 140 - deadZone) {
       // Move backward
       backward();
       motorSpeedA = map(yAxis, 140 - deadZone, 0, -speedRange, 0);
       motorSpeedB = map(yAxis, 140 - deadZone, 0, -speedRange, 0);
+      motorSpeedC = map(yAxis, 140 - deadZone, 0, -speedRange, 0);
+      motorSpeedD = map(yAxis, 140 - deadZone, 0, -speedRange, 0);
     } else {
       // Joystick in the vertical center position, stop the motors
       Stop();
