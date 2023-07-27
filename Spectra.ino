@@ -1,52 +1,53 @@
 #include <SoftwareSerial.h>
 SoftwareSerial BT(2, 3); // RX, TX
-// GPS
-#include <SoftwareSerial.h>
-SoftwareSerial(16, 17); //RX, TX
 
-// Motor control pins for L298 Motor Controller 1
-#define enAONE 4
-#define in1ONE 5
-#define in2ONE 6
-#define in3ONE 7
-#define in4ONE 8
-#define enBONE 9  // Assign a pin for motor controller 1, Motor B
+// Motor pin definitions
+#define bottomRightSpeed 4
+#define bottomRightCW 5
+#define bottomRightCCW 6
+#define bottomLeftCW 7
+#define bottomLeftCCW 8
+#define bottomLeftSpeed 9
 
-// Motor control pins for L298 Motor Controller 2
-#define enATWO 10 // Assign a pin for motor controller 2, Motor A
-#define in1TWO 11
-#define in2TWO 12
-#define in3TWO 13
-#define in4TWO 14
-#define enBTWO 15 // Assign a pin for motor controller 2, Motor B
+#define topLeftSpeed 10
+#define topLeftCW 11
+#define topLeftCCW 12
+#define topRightCW 13
+#define topRightCCW 14
+#define topRightSpeed 15
 
-int xAxis = 140, yAxis = 140;
+// Motor variables
+int xAxis = 140;
+int yAxis = 140;
 int motorSpeedA = 0;
 int motorSpeedB = 0;
+int motorSpeedC = 0;
+int motorSpeedD = 0;
+int speedRange = 255; // Define a value for speedRange
 
 const int deadZone = 10; // Define the dead zone around the center position
 
 void setup() {
-  pinMode(enAONE, OUTPUT);
-  pinMode(enBONE, OUTPUT); 
-  pinMode(enATWO, OUTPUT);
-  pinMode(enBTWO, OUTPUT); 
-  pinMode(in1ONE, OUTPUT);
-  pinMode(in2ONE, OUTPUT);
-  pinMode(in3ONE, OUTPUT);
-  pinMode(in4ONE, OUTPUT);
-  pinMode(in1TWO, OUTPUT);
-  pinMode(in2TWO, OUTPUT);
-  pinMode(in3TWO, OUTPUT);
-  pinMode(in4TWO, OUTPUT);
+  // Set motor pins as OUTPUT
+  pinMode(bottomRightSpeed, OUTPUT);
+  pinMode(bottomLeftSpeed, OUTPUT); 
+  pinMode(topLeftSpeed, OUTPUT);
+  pinMode(topRightSpeed, OUTPUT); 
+  pinMode(bottomRightCW, OUTPUT);
+  pinMode(bottomRightCCW, OUTPUT);
+  pinMode(bottomLeftCW, OUTPUT);
+  pinMode(bottomLeftCCW, OUTPUT);
+  pinMode(topLeftCW, OUTPUT);
+  pinMode(topLeftCCW, OUTPUT);
+  pinMode(topRightCW, OUTPUT);
+  pinMode(topRightCCW, OUTPUT);
 
+  // Start serial communication for debugging
   Serial.begin(9600);
+
+  // Start Bluetooth communication
   BT.begin(9600); // Default communication rate of the Bluetooth module
-  gpsSerial.begin(9600); // GPS module baud rate
-
 }
-
-// ... (rest of the code remains unchanged)
 
 void loop() {
   // Read the incoming data from the Smartphone Android App
@@ -54,190 +55,158 @@ void loop() {
     xAxis = BT.read();
     delay(10);
     yAxis = BT.read();
+    Serial.print("xAxis: ");
     Serial.print(xAxis);
-    Serial.print(",");
+    Serial.print(", yAxis: ");
     Serial.println(yAxis);
   }
-  while (gpsSerial.available() > 0) {
-    if (gps.encode(gpsSerial.read())) {
-      // Read GPS data and format it as a string
-      String gpsData = "LT " + String(gps.location.lat(), 6) + ", LG: " + String(gps.location.lng(), 6);
 
-      // Send GPS data via Bluetooth
-      btSerial.println(gpsData);
-
-      // Output to Serial Monitor for debugging
-      Serial.println(gpsData);
-    }
-  }
-
-  // Motor control logic...
-  int speedRange = 255; // Maximum speed range for the motors
-
+  // Calculate the motor speeds based on the joystick position
+  // Motor Controller 1 (Bottom motors)
   if (xAxis > 140 - deadZone && xAxis < 140 + deadZone && yAxis > 140 - deadZone && yAxis < 140 + deadZone) {
     // Joystick in the center, stop the motors
     Stop();
     motorSpeedA = 0;
     motorSpeedB = 0;
   } else {
-    // Calculate the motor speeds based on the joystick position
-    if (yAxis > 140 - deadZone && yAxis < 140 + deadZone) {
-      // Move left or right
-      if (xAxis < 140 - deadZone) {
-        // Turn left
-        turnLeft();
-        motorSpeedA = map(xAxis, 140 - deadZone, 60, 0, speedRange);
-        motorSpeedB = map(xAxis, 140 - deadZone, 60, 0, speedRange);
-      } else if (xAxis > 140 + deadZone) {
-        // Turn right
-        turnRight();
-        motorSpeedA = map(xAxis, 140 + deadZone, 220, 0, speedRange);
-        motorSpeedB = map(xAxis, 140 + deadZone, 220, 0, speedRange);
-      }
-    } else if (xAxis > 140 - deadZone && xAxis < 140 + deadZone) {
-      // Move forward or backward
-      if (yAxis < 140 - deadZone) {
-        // Forward
-        forward();
-        motorSpeedA = map(yAxis, 140 - deadZone, 60, 0, speedRange);
-        motorSpeedB = map(yAxis, 140 - deadZone, 60, 0, speedRange);
-      } else if (yAxis > 140 + deadZone) {
-        // Backward
-        backward();
-        motorSpeedA = map(yAxis, 140 + deadZone, 220, 0, speedRange);
-        motorSpeedB = map(yAxis, 140 + deadZone, 220, 0, speedRange);
-      }
+    // Calculate the motor speeds based on the joystick position for Motor Controller 1 (Bottom motors)
+    if (yAxis > 140 + deadZone) {
+      // Move forward
+      forward();
+      motorSpeedA = map(yAxis, 140 + deadZone, 255, 0, speedRange);
+      motorSpeedB = map(yAxis, 140 + deadZone, 255, 0, speedRange);
+    } else if (yAxis < 140 - deadZone) {
+      // Move backward
+      backward();
+      motorSpeedA = map(yAxis, 140 - deadZone, 0, -speedRange, 0);
+      motorSpeedB = map(yAxis, 140 - deadZone, 0, -speedRange, 0);
     } else {
-      // Move diagonally
-      if (xAxis < 140 - deadZone && yAxis < 140 - deadZone) {
-        // Forward-left
-        forwardLeft();
-        motorSpeedA = map(xAxis, 140 - deadZone, 60, 0, speedRange);
-        motorSpeedB = 255;
-      } else if (xAxis > 140 + deadZone && yAxis < 140 - deadZone) {
-        // Forward-right
-        forwardRight();
-        motorSpeedA = 255;
-        motorSpeedB = map(xAxis, 140 + deadZone, 220, 0, speedRange);
-      } else if (xAxis < 140 - deadZone && yAxis > 140 + deadZone) {
-        // Backward-left
-        backwardLeft();
-        motorSpeedA = map(xAxis, 140 - deadZone, 60, speedRange, 50);
-        motorSpeedB = 255;
-      } else if (xAxis > 140 + deadZone && yAxis > 140 + deadZone) {
-        // Backward-right
-        backwardRight();
-        motorSpeedA = 255;
-        motorSpeedB = map(xAxis, 140 + deadZone, 220, speedRange, 50);
-      }
+      // Joystick in the vertical center position, stop the motors
+      Stop();
+      motorSpeedA = 0;
+      motorSpeedB = 0;
     }
+  }
+
+  // Calculate the motor speeds based on the joystick position for Motor Controller 2 (Top motors)
+  if (xAxis > 140 + deadZone) {
+    // Turn right
+    forwardRight();
+    motorSpeedC = map(xAxis, 140 + deadZone, 255, 0, speedRange);
+    motorSpeedD = map(xAxis, 140 + deadZone, 255, 0, speedRange);
+  } else if (xAxis < 140 - deadZone) {
+    // Turn left
+    forwardLeft();
+    motorSpeedC = map(xAxis, 140 - deadZone, 0, -speedRange, 0);
+    motorSpeedD = map(xAxis, 140 - deadZone, 0, -speedRange, 0);
+  } else {
+    // Joystick in the horizontal center position, stop the motors
+    Stop();
+    motorSpeedC = 0;
+    motorSpeedD = 0;
   }
 
   // Ensure motor speeds are within the valid range
   motorSpeedA = constrain(motorSpeedA, 0, 255);
   motorSpeedB = constrain(motorSpeedB, 0, 255);
+  motorSpeedC = constrain(motorSpeedC, 0, 255);
+  motorSpeedD = constrain(motorSpeedD, 0, 255);
 
   // Motor control functions for L298 Motor Controller 1
   setMotorSpeedL298_1(motorSpeedA, motorSpeedB);
 
   // Motor control functions for L298 Motor Controller 2
-  setMotorSpeedL298_2(motorSpeedA, motorSpeedB);
+  setMotorSpeedL298_2(motorSpeedC, motorSpeedD);
 }
 
-// ... (previous code remains the same)
-
-// Motor control functions for L298 Motor Controller 1
+// Function to set motor speeds for L298 Motor Controller 1
 void setMotorSpeedL298_1(int speedA, int speedB) {
-  analogWrite(enAONE, speedA);
-  analogWrite(enBONE, speedB);
-  if (speedA > 0) {
-    digitalWrite(in1ONE, HIGH);
-    digitalWrite(in2ONE, LOW);
-  } else {
-    digitalWrite(in1ONE, LOW);
-    digitalWrite(in2ONE, LOW);
-  }
+  // Ensure motor speeds are within the valid range
+  speedA = constrain(speedA, 0, 255);
+  speedB = constrain(speedB, 0, 255);
 
-  if (speedB > 0) {
-    digitalWrite(in3ONE, HIGH);
-    digitalWrite(in4ONE, LOW);
-  } else {
-    digitalWrite(in3ONE, LOW);
-    digitalWrite(in4ONE, LOW);
-  }
+  // Set motor speeds
+  analogWrite(bottomRightSpeed, speedA);
+  analogWrite(bottomLeftSpeed, speedB);
+
+  // Set motor directions based on motor speeds
+  digitalWrite(bottomRightCW, speedA > 0 ? HIGH : LOW);
+  digitalWrite(bottomRightCCW, LOW);
+
+  digitalWrite(bottomLeftCW, speedB > 0 ? HIGH : LOW);
+  digitalWrite(bottomLeftCCW, LOW);
 }
 
-// Motor control functions for L298 Motor Controller 2
+// Function to set motor speeds for L298 Motor Controller 2
 void setMotorSpeedL298_2(int speedA, int speedB) {
-  analogWrite(enATWO, speedA);
-  analogWrite(enBTWO, speedB);
-  if (speedA > 0) {
-    digitalWrite(in1TWO, HIGH);
-    digitalWrite(in2TWO, LOW);
-  } else {
-    digitalWrite(in1TWO, LOW);
-    digitalWrite(in2TWO, LOW);
-  }
+  // Ensure motor speeds are within the valid range
+  speedA = constrain(speedA, 0, 255);
+  speedB = constrain(speedB, 0, 255);
 
-  if (speedB > 0) {
-    digitalWrite(in3TWO, HIGH);
-    digitalWrite(in4TWO, LOW);
-  } else {
-    digitalWrite(in3TWO, LOW);
-    digitalWrite(in4TWO, LOW);
-  }
+  // Set motor speeds
+  analogWrite(topLeftSpeed, speedA);
+  analogWrite(topRightSpeed, speedB);
+
+  // Set motor directions based on motor speeds
+  digitalWrite(topLeftCW, speedA > 0 ? HIGH : LOW);
+  digitalWrite(topLeftCCW, speedA > 0 ? LOW : HIGH);
+
+  digitalWrite(topRightCW, speedB > 0 ? HIGH : LOW);
+  digitalWrite(topRightCCW, speedB > 0 ? LOW : HIGH);
 }
 
-// ... (rest of the code remains the same)
-
-// Your motor control functions (forward, backward, etc.) were not defined correctly
-// I'll provide the correct implementations below:
-
+// Motor control functions for movement directions
 void forward() {
-  digitalWrite(in1ONE, HIGH);
-  digitalWrite(in2ONE, LOW);
-  digitalWrite(in3TWO, HIGH);
-  digitalWrite(in4TWO, LOW);
+  digitalWrite(bottomRightCW, HIGH);
+  digitalWrite(bottomRightCCW, LOW);
+  digitalWrite(bottomLeftCW, HIGH);
+  digitalWrite(bottomLeftCCW, LOW);
+  digitalWrite(topLeftCW, HIGH);
+  digitalWrite(topLeftCCW, LOW);
+  digitalWrite(topRightCW, HIGH);
+  digitalWrite(topRightCCW, LOW);
 }
 
 void backward() {
-  digitalWrite(in1ONE, LOW);
-  digitalWrite(in2ONE, HIGH);
-  digitalWrite(in3TWO, LOW);
-  digitalWrite(in4TWO, HIGH);
+  digitalWrite(bottomRightCW, LOW);
+  digitalWrite(bottomRightCCW, HIGH);
+  digitalWrite(bottomLeftCW, LOW);
+  digitalWrite(bottomLeftCCW, HIGH);
+  digitalWrite(topLeftCW, LOW);
+  digitalWrite(topLeftCCW, HIGH);
+  digitalWrite(topRightCW, LOW);
+  digitalWrite(topRightCCW, HIGH);
 }
 
 void forwardLeft() {
-  digitalWrite(in1ONE, HIGH);
-  digitalWrite(in2ONE, LOW);
-  digitalWrite(in3TWO, LOW);
-  digitalWrite(in4TWO, HIGH);
+  digitalWrite(bottomRightCW, HIGH);
+  digitalWrite(bottomRightCCW, LOW);
+  digitalWrite(bottomLeftCW, LOW);
+  digitalWrite(bottomLeftCCW, HIGH);
+  digitalWrite(topLeftCW, HIGH);
+  digitalWrite(topLeftCCW, LOW);
+  digitalWrite(topRightCW, LOW);
+  digitalWrite(topRightCCW, HIGH);
 }
 
 void forwardRight() {
-  digitalWrite(in1ONE, LOW);
-  digitalWrite(in2ONE, HIGH);
-  digitalWrite(in3TWO, HIGH);
-  digitalWrite(in4TWO, LOW);
-}
-
-void backwardLeft() {
-  digitalWrite(in1ONE, LOW);
-  digitalWrite(in2ONE, HIGH);
-  digitalWrite(in3TWO, LOW);
-  digitalWrite(in4TWO, HIGH);
-}
-
-void backwardRight() {
-  digitalWrite(in1ONE, HIGH);
-  digitalWrite(in2ONE, LOW);
-  digitalWrite(in3TWO, HIGH);
-  digitalWrite(in4TWO, LOW);
+  digitalWrite(bottomRightCW, LOW);
+  digitalWrite(bottomRightCCW, HIGH);
+  digitalWrite(bottomLeftCW, HIGH);
+  digitalWrite(bottomLeftCCW, LOW);
+  digitalWrite(topLeftCW, LOW);
+  digitalWrite(topLeftCCW, HIGH);
+  digitalWrite(topRightCW, HIGH);
+  digitalWrite(topRightCCW, LOW);
 }
 
 void Stop() {
-  digitalWrite(in1ONE, LOW);
-  digitalWrite(in2ONE, LOW);
-  digitalWrite(in3TWO, LOW);
-  digitalWrite(in4TWO, LOW);
+  digitalWrite(bottomRightCW, LOW);
+  digitalWrite(bottomRightCCW, LOW);
+  digitalWrite(bottomLeftCW, LOW);
+  digitalWrite(bottomLeftCCW, LOW);
+  digitalWrite(topLeftCW, LOW);
+  digitalWrite(topLeftCCW, LOW);
+  digitalWrite(topRightCW, LOW);
+  digitalWrite(topRightCCW, LOW);
 }
