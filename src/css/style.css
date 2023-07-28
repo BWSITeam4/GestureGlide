@@ -312,13 +312,11 @@ nav #menu li a:hover {
 
 /*--------------- hero section --------------- */
 .hero {
-      height: 100vh;
+      height: 80vh;
       display: flex;
       align-items: center;
       justify-content: center;
       top: 0;
-
-
 }
 
 
@@ -328,6 +326,8 @@ nav #menu li a:hover {
       text-align: center;
       letter-spacing: 0px;
       line-height: 58px;
+      font-family: 'bm_space', sans-serif;
+      font-style: normal;
 }
 
 @media(max-width: 768px) {
