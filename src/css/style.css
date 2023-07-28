@@ -832,3 +832,48 @@ ul.skills-list li::before{
   color: #9867C5;
   text-decoration: none;
 }
+
+@font-face {
+      font-family: 'a-space';
+      src: url('src\css\fonts\a-space_regular_demo-webfont.woff2') format('woff2'),
+           url('src\css\fonts\a-space_regular_demo-webfont.woff') format('woff');
+      font-weight: normal;
+      font-style: normal;
+  
+  }
+  
+  
+  
+  
+  @font-face {
+      font-family: 'space_age';
+      src: url('src\css\fonts\bmspa___-webfont.woff2') format('woff2'),
+           url('src\css\fonts\bmspa___-webfont.woff') format('woff');
+      font-weight: normal;
+      font-style: normal;
+  
+  }
+  
+  
+  
+  
+  @font-face {
+      font-family: 'bm_space';
+      src: url('src\css\fonts\space_age-webfont.woff2') format('woff2'),
+           url('src\css\fonts\space_age-webfont.woff') format('woff');
+      font-weight: normal;
+      font-style: normal;
+  
+  }
+  
+  
+  
+  
+  @font-face {
+      font-family: 'space_1regular';
+      src: url('src\css\fonts\space_xrebron-webfont.woff2') format('woff2'),
+           url('src\css\fonts\space_xrebron-webfont.woff') format('woff');
+      font-weight: normal;
+      font-style: normal;
+  
+  }
