@@ -346,7 +346,7 @@ nav #menu li a:hover {
 
 @import url('https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css');
 #team {
-    background: rgb(29, 28, 33) !important;
+    background: #9867C5 !important;
 }
 
 .btn-primary:hover,
@@ -470,6 +470,10 @@ section .section-title {
       height: 120px;
       border-radius: 50%;
   }
+
+.card-text {
+      color: rgb(29, 28, 33)
+}
 /*--------------- scroll down icon animation --------------- */
 .scroll-down {
       position: absolute;
