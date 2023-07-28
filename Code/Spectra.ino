@@ -24,8 +24,8 @@ int motorSpeedBottomRight = 0;
 int motorSpeedTopLeft = 0;
 int motorSpeedTopRight = 0;
 int speedRange = 255;  // Define a value for speedRange
+const int deadZone = 20;  // Increase the dead zone to 30 (adjust as needed)
 
-const int deadZone = 10;  // Define the dead zone around the center position
 
 void setup() {
   // Set motor pins as OUTPUT
@@ -60,89 +60,82 @@ void loop() {
     Serial.print(", yAxis: ");
     Serial.println(yAxis);
 
-    if (xAxis > 130 && xAxis < 150 && yAxis > 130 && yAxis < 150) {
+    if (abs(xAxis - 140) < deadZone && abs(yAxis - 140) < deadZone) {
       Stop();
-    }
-
-    if (yAxis > 130 && yAxis < 150) {
-
-      if (xAxis < 130) {
-        turnLeft();
-        motorSpeedBottomLeft = map(xAxis, 130, 60, 0, 255);
-        motorSpeedBottomRight = map(xAxis, 130, 60, 0, 255);
-        motorSpeedTopLeft = map(xAxis, 130, 60, 0, 255);
-        motorSpeedTopRight = map(xAxis, 130, 60, 0, 255);
-      }
-
-      if (xAxis < 254 && xAxis > 150) {
-        turnRight();
-        motorSpeedBottomLeft = map(xAxis, 150, 220, 0, 255);
-        motorSpeedBottomRight = map(xAxis, 150, 220, 0, 255);
-        motorSpeedTopLeft = map(xAxis, 150, 220, 0, 255);
-        motorSpeedTopRight = map(xAxis, 150, 220, 0, 255);
-      }
-
     } else {
-
-      if (xAxis > 120 && xAxis < 160) {
-
-        if (yAxis < 130) {
-          forward();
-        }
-        if (yAxis < 254 && yAxis > 150) {
-          backward();
-        }
-
-        if (yAxis < 130) {
-          motorSpeedBottomLeft = map(yAxis, 130, 60, 0, 255);
-          motorSpeedBottomRight = map(yAxis, 130, 60, 0, 255);
-          motorSpeedTopLeft = map(yAxis, 130, 60, 0, 255);
-          motorSpeedTopRight = map(yAxis, 130, 60, 0, 255);
-        }
-
-        if (yAxis > 150) {
-          motorSpeedBottomLeft = map(yAxis, 150, 220, 0, 255);
-          motorSpeedBottomRight = map(yAxis, 150, 220, 0, 255);
-          motorSpeedTopLeft = map(yAxis, 150, 220, 0, 255);
-          motorSpeedTopRight = map(yAxis, 150, 220, 0, 255);
-        }
-
+      if (yAxis < 140 - deadZone) {
+        // Moving forward
+        motorSpeedBottomLeft = map(yAxis, 0, 140 - deadZone, 0, 255);
+        motorSpeedBottomRight = map(yAxis, 0, 140 - deadZone, 0, 255);
+        motorSpeedTopLeft = map(yAxis, 0, 140 - deadZone, 0, 255);
+        motorSpeedTopRight = map(yAxis, 0, 140 - deadZone, 0, 255);
+      } else if (yAxis > 140 + deadZone) {
+        // Moving backward
+        motorSpeedBottomLeft = map(yAxis, 140 + deadZone, 255, 0, 255);
+        motorSpeedBottomRight = map(yAxis, 140 + deadZone, 255, 0, 255);
+        motorSpeedTopLeft = map(yAxis, 140 + deadZone, 255, 0, 255);
+        motorSpeedTopRight = map(yAxis, 140 + deadZone, 255, 0, 255);
       } else {
+        motorSpeedBottomLeft = 0;
+        motorSpeedBottomRight = 0;
+        motorSpeedTopLeft = 0;
+        motorSpeedTopRight = 0;
+      }
 
-        if (yAxis < 130) {
+      if (xAxis < 140 - deadZone) {
+        // Moving left
+        motorSpeedBottomLeft += map(xAxis, 0, 140 - deadZone, 0, 255);
+        motorSpeedBottomRight -= map(xAxis, 0, 140 - deadZone, 0, 255);
+        motorSpeedTopLeft -= map(xAxis, 0, 140 - deadZone, 0, 255);
+        motorSpeedTopRight += map(xAxis, 0, 140 - deadZone, 0, 255);
+      } else if (xAxis > 140 + deadZone) {
+        // Moving right
+        motorSpeedBottomLeft -= map(xAxis, 140 + deadZone, 255, 0, 255);
+        motorSpeedBottomRight += map(xAxis, 140 + deadZone, 255, 0, 255);
+        motorSpeedTopLeft += map(xAxis, 140 + deadZone, 255, 0, 255);
+        motorSpeedTopRight -= map(xAxis, 140 + deadZone, 255, 0, 255);
+      }
+
+      // Ensure motor speeds are within the valid range
+      motorSpeedBottomLeft = constrain(motorSpeedBottomLeft, 0, 255);
+      motorSpeedBottomRight = constrain(motorSpeedBottomRight, 0, 255);
+      motorSpeedTopLeft = constrain(motorSpeedTopLeft, 0, 255);
+      motorSpeedTopRight = constrain(motorSpeedTopRight, 0, 255);
+
+      // Apply the motor speeds
+      analogWrite(bottomRightSpeed, motorSpeedBottomRight);
+      analogWrite(topRightSpeed, motorSpeedTopRight);
+      analogWrite(bottomLeftSpeed, motorSpeedBottomLeft);
+      analogWrite(topLeftSpeed, motorSpeedTopLeft);
+
+      // Call the movement functions based on the joystick position
+      if (yAxis < 140 - deadZone) {
+        if (xAxis < 140 - deadZone) {
+          forwardLeft();
+        } else if (xAxis > 140 + deadZone) {
+          forwardRight();
+        } else {
           forward();
         }
-        if (yAxis < 254 && yAxis > 150) {
+      } else if (yAxis > 140 + deadZone) {
+        if (xAxis < 140 - deadZone) {
+          backwardLeft();
+        } else if (xAxis > 140 + deadZone) {
+          backwardRight();
+        } else {
           backward();
         }
-
-        if (xAxis < 130) {
-          motorSpeedBottomLeft = map(xAxis, 130, 60, 0, 255);
-          motorSpeedBottomRight = 255;
-          motorSpeedTopLeft = map(xAxis, 130, 60, 0, 255);
-          motorSpeedTopRight = 255;
-        }
-
-        if (xAxis < 254 && xAxis > 150) {
-
-          motorSpeedBottomLeft = 255;
-          motorSpeedBottomRight = map(xAxis, 150, 220, 0, 255);
-          motorSpeedTopLeft = 255;
-          motorSpeedTopRight = map(xAxis, 150, 220, 0, 255);
+      } else {
+        if (xAxis < 140 - deadZone) {
+          turnLeft();
+        } else if (xAxis > 140 + deadZone) {
+          turnRight();
         }
       }
     }
-
-    //Serial.print(motorSpeedA);
-    //Serial.print(",");
-    //Serial.println(motorSpeedA);
-
-    analogWrite(bottomRightSpeed, motorSpeedBottomRight);  // Send PWM signal to motor A
-    analogWrite(topRightSpeed, motorSpeedTopRight); 
-    analogWrite(bottomLeftSpeed, motorSpeedBottomLeft);  // Send PWM signal to motor A
-    analogWrite(topLeftSpeed, motorSpeedTopLeft); 
   }
 }
+
 
 
 
@@ -187,7 +180,7 @@ void loop() {
     digitalWrite(bottomLeftCCW, LOW);
     digitalWrite(topLeftCW, HIGH);
     digitalWrite(topLeftCCW, LOW);
-    digitalWrite(topRightCW, Low);
+    digitalWrite(topRightCW, LOW);
     digitalWrite(topRightCCW, HIGH);
   }
 
@@ -201,3 +194,48 @@ void loop() {
     digitalWrite(topRightCW, LOW);
     digitalWrite(topRightCCW, LOW);
   }
+
+  void forwardRight() {
+    digitalWrite(bottomRightCW, HIGH);
+    digitalWrite(bottomRightCCW, LOW);
+    digitalWrite(bottomLeftCW, LOW);
+    digitalWrite(bottomLeftCCW, LOW);
+    digitalWrite(topLeftCW, HIGH);
+    digitalWrite(topLeftCCW, LOW);
+    digitalWrite(topRightCW, LOW);
+    digitalWrite(topRightCCW, LOW);
+}
+
+void forwardLeft() {
+    digitalWrite(bottomRightCW, LOW);
+    digitalWrite(bottomRightCCW, LOW);
+    digitalWrite(bottomLeftCW, HIGH);
+    digitalWrite(bottomLeftCCW, LOW);
+    digitalWrite(topLeftCW, LOW);
+    digitalWrite(topLeftCCW, LOW);
+    digitalWrite(topRightCW, HIGH);
+    digitalWrite(topRightCCW, LOW);
+}
+
+void backwardRight() {
+    digitalWrite(bottomRightCW, LOW);
+    digitalWrite(bottomRightCCW, LOW);
+    digitalWrite(bottomLeftCW, LOW);
+    digitalWrite(bottomLeftCCW, HIGH);
+    digitalWrite(topLeftCW, LOW);
+    digitalWrite(topLeftCCW, LOW);
+    digitalWrite(topRightCW, HIGH);
+    digitalWrite(topRightCCW, LOW);
+}
+
+void backwardLeft() {
+    digitalWrite(bottomRightCW, HIGH);
+    digitalWrite(bottomRightCCW, LOW);
+    digitalWrite(bottomLeftCW, LOW);
+    digitalWrite(bottomLeftCCW, LOW);
+    digitalWrite(topLeftCW, LOW);
+    digitalWrite(topLeftCCW, HIGH);
+    digitalWrite(topRightCW, LOW);
+    digitalWrite(topRightCCW, LOW);
+}
+
