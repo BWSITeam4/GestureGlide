@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta http-equiv="X-UA-Compatible" content="ie=edge">
+      <meta name="author" content="Aleksander Garbuz">
+      <link rel="apple-touch-icon" sizes="180x180" href="img/apple-touch-icon.png">
+      <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32x32.png">
+      <link rel="icon" type="image/png" sizes="16x16" href="img/favicon-16x16.png">
+      <link rel="manifest" href="img/site.webmanifest">
+      <title>Home | SpectraOne</title>
+      <link rel="stylesheet" href="src/css/style.css">
+      <link rel="stylesheet" href="src/css/plugins.css">
+      <link rel="stylesheet" href="src/css/themify-icons.css">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+      <link rel="stylesheet" href="src/css/helper.css">
+      <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+      <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+      <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,300;0,400;0,500;0,700;1,100;1,300;1,400;1,500;1,700" rel="stylesheet">
+      <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@200;300;400;500;600;700" rel="stylesheet">
+      <link rel="preconnect" href="https://fonts.gstatic.com">
+      <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+      <script src="src/js/t.min.js"></script>
+      <link rel="stylesheet" href="src/css/animate.css">
+      <script src="src/js/wow.min.js"></script>
+      <!-- <script src="src/js/typewriter.js"></script>-->
+
+      <style>
+	</style>
+</head>
+<body>
+
+    <div class="wrapper">
+
+          <!--navbar-->
+          <nav>
+                <span id="brand">
+                      <a href="https://atg218.github.io#home">SpectraOne</a>
+                </span>
+
+                <ul id="menu">
+                      <li><a href="#home">Home<span></span></a></li>
+                      <li><a href="#projects">Projects<span></span></a></li>
+                      <li><a href="#interests">Interests<span></span></a></li>
+                      <li><a href="albedo">Albedo<span></span></a></li>
+                      <li><a href="about">About me<span></span></a></li>
+                      <li><a href="#contact">Contact<span></span></a></li>
+                </ul>
+
+                <div id="toggle">
+                      <div class="span">Menu</div>
+                </div>
+
+          </nav>
+
+          <div id="resize">
+                <div class="close-btn">Close</div>
+
+                <ul id="menu">
+                  <li><a href="#home">Home<span></span></a></li>
+                  <li><a href="#projects">Projects<span></span></a></li>
+                  <li><a href="#interests">Interests<span></span></a></li>
+                  <li><a href="albedo">Albedo<span></span></a></li>
+                  <li><a href="about">About me<span></span></a></li>
+                  <li><a href="#contact">Contact<span></span></a></li>
+                </ul>
+          </div>
+        </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/2.1.2/TweenMax.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.js"></script>
+    <script type="text/javascript">
+        $("#toggle").click(function() {
+            $(this).toggleClass('on');
+            $("#resize").toggleClass("active");
+      });
+
+      $("#resize ul li a").click(function() {
+            $(this).toggleClass('on');
+            $("#resize").toggleClass("active");
+      });
+
+      $(".close-btn").click(function() {
+            $(this).toggleClass('on');
+            $("#resize").toggleClass("active");
+      });
+
+      TweenMax.from("#brand", 1, {
+            delay: 0.4,
+            y: 10,
+            opacity: 0,
+            ease: Expo.easeInOut
+      })
+
+      TweenMax.staggerFrom("#menu li a", 1, {
+            delay: 0.4,
+            opacity: 0,
+            ease: Expo.easeInOut
+      }, 0.1);
+    new WOW().init();
+
+    </script>
+</body>
+</html>
