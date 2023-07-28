@@ -369,7 +369,7 @@ section {
 
 section .section-title {
     text-align: center;
-    color: #000000;
+    color: #9867C5;
     margin-bottom: 50px;
 }
 
@@ -457,12 +457,12 @@ section .section-title {
 
 .backside .card a {
     font-size: 18px;
-    color: rgb(29, 28, 33) !important;
+    color: #9867C5 !important;
 }
 
 .frontside .card .card-title,
 .backside .card .card-title {
-    color: rgb(29, 28, 33)!important;
+    color: #9867C5!important;
 }
 
 .frontside .card .card-body img {
