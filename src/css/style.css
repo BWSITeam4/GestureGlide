@@ -5,7 +5,7 @@ html, body {
       padding: 0;
       width: 100%;
       height: 100%;
-      font-family: 'bm_space', 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
+      font-family: 'bm_space', 'space_age', 'space_1regular', 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
       background: rgb(29, 28, 33) !important; /* 1F4D59 */
       color: rgb(249, 238, 204) !important; /* F9EECC */
       scroll-behavior: smooth;
@@ -326,7 +326,7 @@ nav #menu li a:hover {
       text-align: center;
       letter-spacing: 0px;
       line-height: 58px;
-      font-family: 'bm_space', 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-family: 'bm_space','space_age', 'space_1regular', 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
       font-style: normal;
 }
 
@@ -359,8 +359,8 @@ nav #menu li a:hover {
 
 .btn-primary {
     color: #fff;
-    background-color: #007b5e;
-    border-color: #007b5e;
+    background-color: #9867C5;
+    border-color: #9867C5;
 }
 
 section {
@@ -469,7 +469,7 @@ section .section-title {
       width: 120px;
       height: 120px;
       border-radius: 50%;
-}
+  }
 /*--------------- scroll down icon animation --------------- */
 .scroll-down {
       position: absolute;
@@ -487,6 +487,10 @@ section .section-title {
       border-right: 2px solid rgb(204, 214, 246);
       -webkit-transform: translate(-50%, 0) rotate(45deg);
       animation: fade_move_down 3s cubic-bezier(0.19, 1, 0.22, 1) infinite;
+}
+
+.hidden {
+      display: none;
 }
 
 @keyframes fade_move_down {
