@@ -48,6 +48,7 @@ void setup() {
   // Start Bluetooth communication
   BT.begin(9600);  // Default communication rate of the Bluetooth module
 }
+
 void loop() {
   // Read the incoming data from the Smartphone Android App
   while (BT.available() >= 2) {
@@ -106,6 +107,31 @@ void loop() {
       analogWrite(topRightSpeed, motorSpeedTopRight);
       analogWrite(bottomLeftSpeed, motorSpeedBottomLeft);
       analogWrite(topLeftSpeed, motorSpeedTopLeft);
+
+      // Call the movement functions based on the joystick position
+      if (yAxis < 140 - deadZone) {
+        if (xAxis < 140 - deadZone) {
+          forwardLeft();
+        } else if (xAxis > 140 + deadZone) {
+          forwardRight();
+        } else {
+          forward();
+        }
+      } else if (yAxis > 140 + deadZone) {
+        if (xAxis < 140 - deadZone) {
+          backwardLeft();
+        } else if (xAxis > 140 + deadZone) {
+          backwardRight();
+        } else {
+          backward();
+        }
+      } else {
+        if (xAxis < 140 - deadZone) {
+          turnLeft();
+        } else if (xAxis > 140 + deadZone) {
+          turnRight();
+        }
+      }
     }
   }
 }
@@ -168,3 +194,48 @@ void loop() {
     digitalWrite(topRightCW, LOW);
     digitalWrite(topRightCCW, LOW);
   }
+
+  void forwardRight() {
+    digitalWrite(bottomRightCW, HIGH);
+    digitalWrite(bottomRightCCW, LOW);
+    digitalWrite(bottomLeftCW, LOW);
+    digitalWrite(bottomLeftCCW, LOW);
+    digitalWrite(topLeftCW, HIGH);
+    digitalWrite(topLeftCCW, LOW);
+    digitalWrite(topRightCW, LOW);
+    digitalWrite(topRightCCW, LOW);
+}
+
+void forwardLeft() {
+    digitalWrite(bottomRightCW, LOW);
+    digitalWrite(bottomRightCCW, LOW);
+    digitalWrite(bottomLeftCW, HIGH);
+    digitalWrite(bottomLeftCCW, LOW);
+    digitalWrite(topLeftCW, LOW);
+    digitalWrite(topLeftCCW, LOW);
+    digitalWrite(topRightCW, HIGH);
+    digitalWrite(topRightCCW, LOW);
+}
+
+void backwardRight() {
+    digitalWrite(bottomRightCW, LOW);
+    digitalWrite(bottomRightCCW, LOW);
+    digitalWrite(bottomLeftCW, LOW);
+    digitalWrite(bottomLeftCCW, HIGH);
+    digitalWrite(topLeftCW, LOW);
+    digitalWrite(topLeftCCW, LOW);
+    digitalWrite(topRightCW, HIGH);
+    digitalWrite(topRightCCW, LOW);
+}
+
+void backwardLeft() {
+    digitalWrite(bottomRightCW, HIGH);
+    digitalWrite(bottomRightCCW, LOW);
+    digitalWrite(bottomLeftCW, LOW);
+    digitalWrite(bottomLeftCCW, LOW);
+    digitalWrite(topLeftCW, LOW);
+    digitalWrite(topLeftCCW, HIGH);
+    digitalWrite(topRightCW, LOW);
+    digitalWrite(topRightCCW, LOW);
+}
+
