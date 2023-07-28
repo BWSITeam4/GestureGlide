@@ -98,43 +98,49 @@ void HandleHorizontalMovement() {
 
 void HandleVerticalMovement() {
   if (xAxis > 130 && xAxis < 150) {
+    // Move forward or backward
     if (yAxis < 130) {
       forward();
-    } else if (yAxis < 254 && yAxis > 150) {
+    } else if (yAxis > 150) {
       backward();
     }
 
+    // Adjust motor speeds based on the y-axis value
+    int motorSpeed = map(yAxis, 130, 150, 0, speedRange);
+    motorSpeedBottomLeft = motorSpeed;
+    motorSpeedBottomRight = motorSpeed;
+    motorSpeedTopLeft = motorSpeed;
+    motorSpeedTopRight = motorSpeed;
+  } else {
+    // Move forward or backward while turning left or right
     if (yAxis < 130) {
       motorSpeedBottomLeft = map(yAxis, 130, 60, 0, speedRange);
-      motorSpeedBottomRight = map(yAxis, 130, 60, 0, speedRange);
+      motorSpeedBottomRight = speedRange;
       motorSpeedTopLeft = map(yAxis, 130, 60, 0, speedRange);
-      motorSpeedTopRight = map(yAxis, 130, 60, 0, speedRange);
+      motorSpeedTopRight = speedRange;
     } else if (yAxis > 150) {
-      motorSpeedBottomLeft = map(yAxis, 150, 220, 0, speedRange);
+      motorSpeedBottomLeft = speedRange;
       motorSpeedBottomRight = map(yAxis, 150, 220, 0, speedRange);
-      motorSpeedTopLeft = map(yAxis, 150, 220, 0, speedRange);
+      motorSpeedTopLeft = speedRange;
       motorSpeedTopRight = map(yAxis, 150, 220, 0, speedRange);
     }
-  } else {
-    if (yAxis < 130) {
-      forward();
-    } else if (yAxis < 254 && yAxis > 150) {
-      backward();
-    }
 
+    // Adjust motor speeds based on the x-axis value
+    int motorSpeedX = map(xAxis, 130, 150, 0, speedRange);
+    motorSpeedBottomLeft = (motorSpeedBottomLeft * (speedRange - motorSpeedX)) / speedRange;
+    motorSpeedBottomRight = (motorSpeedBottomRight * (speedRange - motorSpeedX)) / speedRange;
+    motorSpeedTopLeft = (motorSpeedTopLeft * (speedRange - motorSpeedX)) / speedRange;
+    motorSpeedTopRight = (motorSpeedTopRight * (speedRange - motorSpeedX)) / speedRange;
+
+    // Turn left or right
     if (xAxis < 130) {
-      motorSpeedBottomLeft = map(xAxis, 130, 60, 0, speedRange);
-      motorSpeedBottomRight = 255;
-      motorSpeedTopLeft = map(xAxis, 130, 60, 0, speedRange);
-      motorSpeedTopRight = 255;
-    } else if (xAxis < 254 && xAxis > 150) {
-      motorSpeedBottomLeft = 255;
-      motorSpeedBottomRight = map(xAxis, 150, 220, 0, speedRange);
-      motorSpeedTopLeft = 255;
-      motorSpeedTopRight = map(xAxis, 150, 220, 0, speedRange);
+      turnLeft();
+    } else if (xAxis > 150) {
+      turnRight();
     }
   }
 }
+
 
 // Motor control functions for movement directions
 void forward() {
@@ -155,7 +161,7 @@ void backward() {
   digitalWrite(bottomLeftCCW, HIGH);
   digitalWrite(topLeftCW, LOW);
   digitalWrite(topLeftCCW, HIGH);
-  digitalWrite(topRightCW, LOW);
+  digitalWrite(topRightCW, LOW  );
   digitalWrite(topRightCCW, HIGH);
 }
 
