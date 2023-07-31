@@ -1,22 +1,21 @@
 #include <SoftwareSerial.h>
-SoftwareSerial BT(2, 3);  // RX, TX
+SoftwareSerial BT(10, 11);  // RX, TX
 
 // Motor pin definitions
-#define bottomRightSpeed 4
-#define bottomRightCW 5
-#define bottomRightCCW 6
-#define bottomLeftCW 7
-#define bottomLeftCCW 8
-#define bottomLeftSpeed 9
+#define bottomRightSpeed 32
+#define bottomRightCW 28
+#define bottomRightCCW 30
+#define bottomLeftCW 24
+#define bottomLeftCCW 26
+#define bottomLeftSpeed 22
 
-#define topLeftSpeed 10
-#define topLeftCW 11
-#define topLeftCCW 12
-#define topRightCW 13
-#define topRightCCW 14
-#define topRightSpeed 15
+#define topLeftSpeed 23 
+#define topLeftCW 25
+#define topLeftCCW 27
+#define topRightCW 31
+#define topRightCCW 29
+#define topRightSpeed 33
 
-// Motor variables
 int xAxis = 140;
 int yAxis = 140;
 int motorSpeedBottomLeft = 0;
@@ -24,7 +23,8 @@ int motorSpeedBottomRight = 0;
 int motorSpeedTopLeft = 0;
 int motorSpeedTopRight = 0;
 int speedRange = 255;  // Define a value for speedRange
-const int deadZone = 20;  // Increase the dead zone to 30 (adjust as needed)
+const int deadZone = 30; // Adjust dead zone as needed
+const int smoothingFactor = 5; // Adjust smoothing factor as needed
 
 void setup() {
   // Set motor pins as OUTPUT
@@ -51,13 +51,13 @@ void setup() {
 void loop() {
   // Read the incoming data from the Smartphone Android App
   while (BT.available() >= 2) {
-    xAxis = BT.read();
+    // Smooth the joystick inputs
+    xAxis = smoothInput(BT.read());
+    Serial.println(xAxis);
     delay(10);
-    yAxis = BT.read();
-    Serial.print("xAxis: ");
-    Serial.print(xAxis);
-    Serial.print(", yAxis: ");
+    yAxis = smoothInput(BT.read());
     Serial.println(yAxis);
+    // ... (same as before)
 
     if (xAxis > 130 && xAxis < 150 && yAxis > 130 && yAxis < 150) {
       Stop();
@@ -98,49 +98,53 @@ void HandleHorizontalMovement() {
 
 void HandleVerticalMovement() {
   if (xAxis > 130 && xAxis < 150) {
-    // Move forward or backward
     if (yAxis < 130) {
       forward();
-    } else if (yAxis > 150) {
+    } else if (yAxis < 254 && yAxis > 150) {
       backward();
     }
 
-    // Adjust motor speeds based on the y-axis value
-    int motorSpeed = map(yAxis, 130, 150, 0, speedRange);
-    motorSpeedBottomLeft = motorSpeed;
-    motorSpeedBottomRight = motorSpeed;
-    motorSpeedTopLeft = motorSpeed;
-    motorSpeedTopRight = motorSpeed;
-  } else {
-    // Move forward or backward while turning left or right
     if (yAxis < 130) {
       motorSpeedBottomLeft = map(yAxis, 130, 60, 0, speedRange);
-      motorSpeedBottomRight = speedRange;
+      motorSpeedBottomRight = map(yAxis, 130, 60, 0, speedRange);
       motorSpeedTopLeft = map(yAxis, 130, 60, 0, speedRange);
-      motorSpeedTopRight = speedRange;
+      motorSpeedTopRight = map(yAxis, 130, 60, 0, speedRange);
     } else if (yAxis > 150) {
-      motorSpeedBottomLeft = speedRange;
+      motorSpeedBottomLeft = map(yAxis, 150, 220, 0, speedRange);
       motorSpeedBottomRight = map(yAxis, 150, 220, 0, speedRange);
-      motorSpeedTopLeft = speedRange;
+      motorSpeedTopLeft = map(yAxis, 150, 220, 0, speedRange);
       motorSpeedTopRight = map(yAxis, 150, 220, 0, speedRange);
     }
+  } else {
+    if (yAxis < 130) {
+      forward();
+    } else if (yAxis < 254 && yAxis > 150) {
+      backward();
+    }
 
-    // Adjust motor speeds based on the x-axis value
-    int motorSpeedX = map(xAxis, 130, 150, 0, speedRange);
-    motorSpeedBottomLeft = (motorSpeedBottomLeft * (speedRange - motorSpeedX)) / speedRange;
-    motorSpeedBottomRight = (motorSpeedBottomRight * (speedRange - motorSpeedX)) / speedRange;
-    motorSpeedTopLeft = (motorSpeedTopLeft * (speedRange - motorSpeedX)) / speedRange;
-    motorSpeedTopRight = (motorSpeedTopRight * (speedRange - motorSpeedX)) / speedRange;
-
-    // Turn left or right
     if (xAxis < 130) {
-      turnLeft();
-    } else if (xAxis > 150) {
-      turnRight();
+      motorSpeedBottomLeft = map(xAxis, 130, 60, 0, speedRange);
+      motorSpeedBottomRight = 255;
+      motorSpeedTopLeft = map(xAxis, 130, 60, 0, speedRange);
+      motorSpeedTopRight = 255;
+    } else if (xAxis < 254 && xAxis > 150) {
+      motorSpeedBottomLeft = 255;
+      motorSpeedBottomRight = map(xAxis, 150, 220, 0, speedRange);
+      motorSpeedTopLeft = 255;
+      motorSpeedTopRight = map(xAxis, 150, 220, 0, speedRange);
     }
   }
 }
-
+int smoothInput(int inputValue) {
+  static int prevValue = 0;
+  int smoothedValue = (inputValue + prevValue * (smoothingFactor - 1)) / smoothingFactor;
+  prevValue = smoothedValue;
+  if (abs(smoothedValue - 128) < deadZone) {
+    return 128; // Center position if within dead zone
+  } else {
+    return smoothedValue;
+  }
+}
 
 // Motor control functions for movement directions
 void forward() {
@@ -161,7 +165,7 @@ void backward() {
   digitalWrite(bottomLeftCCW, HIGH);
   digitalWrite(topLeftCW, LOW);
   digitalWrite(topLeftCCW, HIGH);
-  digitalWrite(topRightCW, LOW  );
+  digitalWrite(topRightCW, LOW);
   digitalWrite(topRightCCW, HIGH);
 }
 
