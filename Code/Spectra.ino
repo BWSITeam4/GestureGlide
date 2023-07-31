@@ -1,9 +1,5 @@
 #include <SoftwareSerial.h>
-#include <TinyGPS++.h>
 SoftwareSerial BT(10, 11);  // RX, TX
-SoftwareSerial gpsSerial(34, 35); //RX, TX
-
-TinyGPSPlus gps;
 
 // Motor pin definitions
 #define bottomRightSpeed 32
@@ -13,13 +9,14 @@ TinyGPSPlus gps;
 #define bottomLeftCCW 26
 #define bottomLeftSpeed 22
 
-#define topLeftSpeed 23 
+#define topLeftSpeed 23
 #define topLeftCW 25
 #define topLeftCCW 27
 #define topRightCW 31
 #define topRightCCW 29
 #define topRightSpeed 33
 
+// Motor variables
 int xAxis = 140;
 int yAxis = 140;
 int motorSpeedBottomLeft = 0;
@@ -27,8 +24,7 @@ int motorSpeedBottomRight = 0;
 int motorSpeedTopLeft = 0;
 int motorSpeedTopRight = 0;
 int speedRange = 255;  // Define a value for speedRange
-const int deadZone = 30; // Adjust dead zone as needed
-const int smoothingFactor = 5; // Adjust smoothing factor as needed
+const int deadZone = 20;  // Increase the dead zone to 30 (adjust as needed)
 
 void setup() {
   // Set motor pins as OUTPUT
@@ -50,35 +46,19 @@ void setup() {
 
   // Start Bluetooth communication
   BT.begin(9600);  // Default communication rate of the Bluetooth module
-
-  // Start GPS Communication
-  gpsSerial.begin(9600); // GPS module baud rate
-
 }
 
 void loop() {
   // Read the incoming data from the Smartphone Android App
   while (BT.available() >= 2) {
-    // Smooth the joystick inputs
-    xAxis = smoothInput(BT.read());
-    Serial.println(xAxis);
+    xAxis = BT.read();
     delay(10);
-    yAxis = smoothInput(BT.read());
+    yAxis = BT.read();
+    Serial.print("xAxis: ");
+    Serial.print(xAxis);
+    Serial.print(", yAxis: ");
     Serial.println(yAxis);
-    // ... (same as before)
-  // Read GPS data
-  while (gpsSerial.available() > 0) {
-    if (gps.encode(gpsSerial.read())) {
-      // Read GPS data and format it as a string
-      String gpsData = "Latitude: " + String(gps.location.lat(), 6) + ", Longitude: " + String(gps.location.lng(), 6);
 
-      // Send GPS data via Bluetooth
-      btSerial.println(gpsData);
-
-      // Output to Serial Monitor for debugging
-      Serial.println(gpsData);
-    }
-  }
     if (xAxis > 130 && xAxis < 150 && yAxis > 130 && yAxis < 150) {
       Stop();
     } else {
@@ -93,81 +73,40 @@ void loop() {
 }
 
 void HandleMovement() {
-  if (yAxis > 130 && yAxis < 150) {
-    HandleHorizontalMovement();
-  } else {
-    HandleVerticalMovement();
-  }
-}
-
-void HandleHorizontalMovement() {
-  if (xAxis < 130) {
-    motorSpeedBottomLeft = map(xAxis, 130, 60, 0, speedRange);
-    motorSpeedBottomRight = map(xAxis, 130, 60, 0, speedRange);
-    motorSpeedTopLeft = map(xAxis, 130, 60, 0, speedRange);
-    motorSpeedTopRight = map(xAxis, 130, 60, 0, speedRange);
-    turnLeft();
-  } else if (xAxis < 254 && xAxis > 150) {
-    motorSpeedBottomLeft = map(xAxis, 150, 220, 0, speedRange);
-    motorSpeedBottomRight = map(xAxis, 150, 220, 0, speedRange);
-    motorSpeedTopLeft = map(xAxis, 150, 220, 0, speedRange);
-    motorSpeedTopRight = map(xAxis, 150, 220, 0, speedRange);
-    turnRight();
-  }
-}
-
-void HandleVerticalMovement() {
-  if (xAxis > 130 && xAxis < 150) {
-    if (yAxis < 130) {
+  if (yAxis <= 130) {
+    if (xAxis <= 130) {
+      forwardLeft();
+    } else if (xAxis >= 150) {
+      forwardRight();
+    } else {
       forward();
-    } else if (yAxis < 254 && yAxis > 150) {
+    }
+  } else if (yAxis >= 150) {
+    if (xAxis <= 130) {
+      backwardLeft();
+    } else if (xAxis >= 150) {
+      backwardRight();
+    } else {
       backward();
     }
-
-    if (yAxis < 130) {
-      motorSpeedBottomLeft = map(yAxis, 130, 60, 0, speedRange);
-      motorSpeedBottomRight = map(yAxis, 130, 60, 0, speedRange);
-      motorSpeedTopLeft = map(yAxis, 130, 60, 0, speedRange);
-      motorSpeedTopRight = map(yAxis, 130, 60, 0, speedRange);
-    } else if (yAxis > 150) {
-      motorSpeedBottomLeft = map(yAxis, 150, 220, 0, speedRange);
-      motorSpeedBottomRight = map(yAxis, 150, 220, 0, speedRange);
-      motorSpeedTopLeft = map(yAxis, 150, 220, 0, speedRange);
-      motorSpeedTopRight = map(yAxis, 150, 220, 0, speedRange);
-    }
   } else {
-    if (yAxis < 130) {
-      forward();
-    } else if (yAxis < 254 && yAxis > 150) {
-      backward();
+    if (xAxis <= 130) {
+      turnLeft();
+    } else if (xAxis >= 150) {
+      turnRight();
+    } else {
+      Stop();
     }
-
-    if (xAxis < 130) {
-      motorSpeedBottomLeft = map(xAxis, 130, 60, 0, speedRange);
-      motorSpeedBottomRight = 255;
-      motorSpeedTopLeft = map(xAxis, 130, 60, 0, speedRange);
-      motorSpeedTopRight = 255;
-    } else if (xAxis < 254 && xAxis > 150) {
-      motorSpeedBottomLeft = 255;
-      motorSpeedBottomRight = map(xAxis, 150, 220, 0, speedRange);
-      motorSpeedTopLeft = 255;
-      motorSpeedTopRight = map(xAxis, 150, 220, 0, speedRange);
-    }
-  }
-}
-int smoothInput(int inputValue) {
-  static int prevValue = 0;
-  int smoothedValue = (inputValue + prevValue * (smoothingFactor - 1)) / smoothingFactor;
-  prevValue = smoothedValue;
-  if (abs(smoothedValue - 128) < deadZone) {
-    return 128; // Center position if within dead zone
-  } else {
-    return smoothedValue;
   }
 }
 
 // Motor control functions for movement directions
 void forward() {
+  int speed = map(yAxis, 130, 60, 0, speedRange);
+  motorSpeedBottomLeft = speed;
+  motorSpeedBottomRight = speed;
+  motorSpeedTopLeft = speed;
+  motorSpeedTopRight = speed;
   digitalWrite(bottomRightCW, HIGH);
   digitalWrite(bottomRightCCW, LOW);
   digitalWrite(bottomLeftCW, HIGH);
@@ -179,6 +118,11 @@ void forward() {
 }
 
 void backward() {
+  int speed = map(yAxis, 150, 220, 0, speedRange);
+  motorSpeedBottomLeft = speed;
+  motorSpeedBottomRight = speed;
+  motorSpeedTopLeft = speed;
+  motorSpeedTopRight = speed;
   digitalWrite(bottomRightCW, LOW);
   digitalWrite(bottomRightCCW, HIGH);
   digitalWrite(bottomLeftCW, LOW);
@@ -190,6 +134,11 @@ void backward() {
 }
 
 void turnLeft() {
+  int speed = map(xAxis, 130, 60, 0, speedRange);
+  motorSpeedBottomLeft = speed;
+  motorSpeedBottomRight = speed;
+  motorSpeedTopLeft = speed;
+  motorSpeedTopRight = speed;
   digitalWrite(bottomRightCW, HIGH);
   digitalWrite(bottomRightCCW, LOW);
   digitalWrite(bottomLeftCW, LOW);
@@ -201,6 +150,11 @@ void turnLeft() {
 }
 
 void turnRight() {
+  int speed = map(xAxis, 150, 220, 0, speedRange);
+  motorSpeedBottomLeft = speed;
+  motorSpeedBottomRight = speed;
+  motorSpeedTopLeft = speed;
+  motorSpeedTopRight = speed;
   digitalWrite(bottomRightCW, LOW);
   digitalWrite(bottomRightCCW, HIGH);
   digitalWrite(bottomLeftCW, HIGH);
@@ -211,7 +165,79 @@ void turnRight() {
   digitalWrite(topRightCCW, HIGH);
 }
 
+void forwardLeft() {
+  int speedY = map(yAxis, 130, 60, 0, speedRange);
+  int speedX = map(xAxis, 130, 60, 0, speedRange);
+  motorSpeedBottomLeft = speedY;
+  motorSpeedTopRight = speedY;
+  motorSpeedBottomRight = speedX;
+  motorSpeedTopLeft = 0;
+  digitalWrite(bottomRightCW, HIGH);
+  digitalWrite(bottomRightCCW, LOW);
+  digitalWrite(bottomLeftCW, LOW);
+  digitalWrite(bottomLeftCCW, LOW);
+  digitalWrite(topLeftCW, LOW);
+  digitalWrite(topLeftCCW, LOW);
+  digitalWrite(topRightCW, HIGH);
+  digitalWrite(topRightCCW, LOW);
+}
+
+void forwardRight() {
+  int speedY = map(yAxis, 130, 60, 0, speedRange);
+  int speedX = map(xAxis, 220, 150, 0, speedRange);
+  motorSpeedBottomRight = speedY;
+  motorSpeedTopLeft = speedY;
+  motorSpeedBottomLeft = speedX;
+  motorSpeedTopRight = 0;
+  digitalWrite(bottomRightCW, LOW);
+  digitalWrite(bottomRightCCW, LOW);
+  digitalWrite(bottomLeftCW, HIGH);
+  digitalWrite(bottomLeftCCW, LOW);
+  digitalWrite(topLeftCW, HIGH);
+  digitalWrite(topLeftCCW,LOW);
+  digitalWrite(topRightCW, LOW);
+  digitalWrite(topRightCCW, LOW);
+}
+
+void backwardLeft() {
+  int speedY = map(yAxis, 220, 150, 0, speedRange);
+  int speedX = map(xAxis, 130, 60, 0, speedRange);
+  motorSpeedTopLeft = speedY;
+  motorSpeedBottomRight = speedY;
+  motorSpeedTopRight = speedX;
+  motorSpeedBottomLeft = 0;
+  digitalWrite(bottomRightCW, LOW);
+  digitalWrite(bottomRightCCW, LOW);
+  digitalWrite(bottomLeftCW, LOW);
+  digitalWrite(bottomLeftCCW, HIGH);
+  digitalWrite(topLeftCW, LOW);
+  digitalWrite(topLeftCCW, HIGH);
+  digitalWrite(topRightCW, LOW);
+  digitalWrite(topRightCCW, LOW);
+}
+
+void backwardRight() {
+  int speedY = map(yAxis, 220, 150, 0, speedRange);
+  int speedX = map(xAxis, 220, 150, 0, speedRange);
+  motorSpeedTopRight = speedY;
+  motorSpeedBottomLeft = speedY;
+  motorSpeedTopLeft = speedX;
+  motorSpeedBottomRight = 0;
+  digitalWrite(bottomRightCW, LOW);
+  digitalWrite(bottomRightCCW, HIGH);
+  digitalWrite(bottomLeftCW, LOW);
+  digitalWrite(bottomLeftCCW, LOW);
+  digitalWrite(topLeftCW, LOW);
+  digitalWrite(topLeftCCW, LOW);
+  digitalWrite(topRightCW, LOW);
+  digitalWrite(topRightCCW, HIGH);
+}
+
 void Stop() {
+  motorSpeedBottomLeft = 0;
+  motorSpeedBottomRight = 0;
+  motorSpeedTopLeft = 0;
+  motorSpeedTopRight = 0;
   digitalWrite(bottomRightCW, LOW);
   digitalWrite(bottomRightCCW, LOW);
   digitalWrite(bottomLeftCW, LOW);
