@@ -1,5 +1,9 @@
 #include <SoftwareSerial.h>
+#include <TinyGPS++.h>
 SoftwareSerial BT(10, 11);  // RX, TX
+SoftwareSerial gpsSerial(34, 35); //RX, TX
+
+TinyGPSPlus gps;
 
 // Motor pin definitions
 #define bottomRightSpeed 32
@@ -46,6 +50,10 @@ void setup() {
 
   // Start Bluetooth communication
   BT.begin(9600);  // Default communication rate of the Bluetooth module
+
+  // Start GPS Communication
+  gpsSerial.begin(9600); // GPS module baud rate
+
 }
 
 void loop() {
@@ -58,7 +66,19 @@ void loop() {
     yAxis = smoothInput(BT.read());
     Serial.println(yAxis);
     // ... (same as before)
+  // Read GPS data
+  while (gpsSerial.available() > 0) {
+    if (gps.encode(gpsSerial.read())) {
+      // Read GPS data and format it as a string
+      String gpsData = "Latitude: " + String(gps.location.lat(), 6) + ", Longitude: " + String(gps.location.lng(), 6);
 
+      // Send GPS data via Bluetooth
+      btSerial.println(gpsData);
+
+      // Output to Serial Monitor for debugging
+      Serial.println(gpsData);
+    }
+  }
     if (xAxis > 130 && xAxis < 150 && yAxis > 130 && yAxis < 150) {
       Stop();
     } else {
