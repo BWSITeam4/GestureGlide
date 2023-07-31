@@ -102,7 +102,7 @@ void HandleMovement() {
 
 // Motor control functions for movement directions
 void forward() {
-  int speed = map(yAxis, 130, 60, 0, speedRange);
+  int speed = map(yAxis, 110, 50, 0, speedRange);
   motorSpeedBottomLeft = speed;
   motorSpeedBottomRight = speed;
   motorSpeedTopLeft = speed;
@@ -118,7 +118,7 @@ void forward() {
 }
 
 void backward() {
-  int speed = map(yAxis, 150, 220, 0, speedRange);
+  int speed = map(yAxis, 160, 200, 0, speedRange);
   motorSpeedBottomLeft = speed;
   motorSpeedBottomRight = speed;
   motorSpeedTopLeft = speed;
@@ -134,7 +134,7 @@ void backward() {
 }
 
 void turnLeft() {
-  int speed = map(xAxis, 130, 60, 0, speedRange);
+  int speed = map(xAxis, 110, 50, 0, speedRange);
   motorSpeedBottomLeft = speed;
   motorSpeedBottomRight = speed;
   motorSpeedTopLeft = speed;
@@ -150,7 +150,7 @@ void turnLeft() {
 }
 
 void turnRight() {
-  int speed = map(xAxis, 150, 220, 0, speedRange);
+  int speed = map(xAxis, 160, 200, 0, speedRange);
   motorSpeedBottomLeft = speed;
   motorSpeedBottomRight = speed;
   motorSpeedTopLeft = speed;
@@ -166,11 +166,10 @@ void turnRight() {
 }
 
 void forwardLeft() {
-  int speedY = map(yAxis, 130, 60, 0, speedRange);
-  int speedX = map(xAxis, 130, 60, 0, speedRange);
-  motorSpeedBottomLeft = speedY;
-  motorSpeedTopRight = speedY;
-  motorSpeedBottomRight = speedX;
+  int speed = map(xAxis, 130, 50, 0, speedRange);
+  motorSpeedBottomLeft = 0;
+  motorSpeedTopRight = speed;
+  motorSpeedBottomRight = speed;
   motorSpeedTopLeft = 0;
   digitalWrite(bottomRightCW, HIGH);
   digitalWrite(bottomRightCCW, LOW);
@@ -183,11 +182,10 @@ void forwardLeft() {
 }
 
 void forwardRight() {
-  int speedY = map(yAxis, 130, 60, 0, speedRange);
-  int speedX = map(xAxis, 220, 150, 0, speedRange);
-  motorSpeedBottomRight = speedY;
-  motorSpeedTopLeft = speedY;
-  motorSpeedBottomLeft = speedX;
+  int speed = map(xAxis, 150, 200, 0, speedRange);
+  motorSpeedBottomRight = 0;
+  motorSpeedTopLeft = speed;
+  motorSpeedBottomLeft = speed;
   motorSpeedTopRight = 0;
   digitalWrite(bottomRightCW, LOW);
   digitalWrite(bottomRightCCW, LOW);
@@ -200,29 +198,9 @@ void forwardRight() {
 }
 
 void backwardLeft() {
-  int speedY = map(yAxis, 220, 150, 0, speedRange);
-  int speedX = map(xAxis, 130, 60, 0, speedRange);
-  motorSpeedTopLeft = speedY;
-  motorSpeedBottomRight = speedY;
-  motorSpeedTopRight = speedX;
-  motorSpeedBottomLeft = 0;
-  digitalWrite(bottomRightCW, LOW);
-  digitalWrite(bottomRightCCW, LOW);
-  digitalWrite(bottomLeftCW, LOW);
-  digitalWrite(bottomLeftCCW, HIGH);
-  digitalWrite(topLeftCW, LOW);
-  digitalWrite(topLeftCCW, HIGH);
-  digitalWrite(topRightCW, LOW);
-  digitalWrite(topRightCCW, LOW);
-}
-
-void backwardRight() {
-  int speedY = map(yAxis, 220, 150, 0, speedRange);
-  int speedX = map(xAxis, 220, 150, 0, speedRange);
-  motorSpeedTopRight = speedY;
-  motorSpeedBottomLeft = speedY;
-  motorSpeedTopLeft = speedX;
-  motorSpeedBottomRight = 0;
+ int speed = map(xAxis, 130, 50, 0, speedRange);
+  motorSpeedTopRight = speed;
+  motorSpeedBottomRight = speed;
   digitalWrite(bottomRightCW, LOW);
   digitalWrite(bottomRightCCW, HIGH);
   digitalWrite(bottomLeftCW, LOW);
@@ -231,6 +209,21 @@ void backwardRight() {
   digitalWrite(topLeftCCW, LOW);
   digitalWrite(topRightCW, LOW);
   digitalWrite(topRightCCW, HIGH);
+}
+
+void backwardRight() {
+ 
+  int speed = map(xAxis, 150, 200, 0, speedRange);
+  motorSpeedTopLeft = speed;
+  motorSpeedBottomLeft = speed;
+  digitalWrite(bottomRightCW, LOW);
+  digitalWrite(bottomRightCCW, LOW);
+  digitalWrite(bottomLeftCW, LOW);
+  digitalWrite(bottomLeftCCW, HIGH);
+  digitalWrite(topLeftCW, LOW);
+  digitalWrite(topLeftCCW, HIGH);
+  digitalWrite(topRightCW, LOW);
+  digitalWrite(topRightCCW, LOW);
 }
 
 void Stop() {
