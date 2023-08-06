@@ -121,8 +121,7 @@ void setup() {
   // Start Bluetooth communication
   BT.begin(9600);  // Default communication rate of the Bluetooth module
 
-  // Initialize GPS serial connection
-  ss.begin(9600);
+  
 }
 
 void loop() {
@@ -191,6 +190,9 @@ void loop() {
           delay(10);
           destination_LG = BT.read();
         }
+
+        // Initialize GPS serial connection
+        ss.begin(9600);
 
         if (!arrived) {
           if (distance < safeDistance) {
