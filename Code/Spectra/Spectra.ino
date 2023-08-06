@@ -219,7 +219,7 @@ void loop() {
           } else if (back_sensor < safeDistance) {
             forward();
           } else if (front_sensor < safeDistance && right_sensor < safeDistance & left_sensor < safeDistance && back_sensor < safeDistance) {
-            stop();
+            Stop();
           } else {
             if (left_sensor < safeDistance) {
               turnRight();
