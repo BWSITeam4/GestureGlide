@@ -129,7 +129,6 @@ void loop() {
   // Read the incoming data from the Smartphone Android App
   rotateServo();
 
-
   while (BT.available() >= 2) {
     xAxis = BT.read();
     delay(10);
@@ -194,7 +193,7 @@ void loop() {
         }
 
         if (!arrived) {
-          if (front_sensor < safeDistance) {
+          if (distance < safeDistance) {
             Stop();
             delay(500);  //allowing the rover to stop
 
@@ -218,7 +217,7 @@ void loop() {
             delay(500);  //allowing the rover to change its direction
           } else if (back_sensor < safeDistance) {
             forward();
-          } else if (front_sensor < safeDistance && right_sensor < safeDistance & left_sensor < safeDistance && back_sensor < safeDistance) {
+          } else if (distance < safeDistance && right_sensor < safeDistance & left_sensor < safeDistance && back_sensor < safeDistance) {
             Stop();
           } else {
             if (left_sensor < safeDistance) {
